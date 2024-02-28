@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+  }
+
+  #btn {
+    padding: 30px 80px;
+    font-size: 25px;
+    cursor: pointer;
+    background-color: green;
+    border: none;
+  }
+
+  #reset {
+    padding: 5px 10px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+</style>
+
+<body>
+  <div class="container">
+    <button id="btn">Mic</button>
+    <button id="reset">Reset</button>
+    </dib>
+    <script>
+      btn = document.getElementById('btn');
+      btn.addEventListener('mousedown', async () => {
+        btn.style.backgroundColor = 'red';
+        await fetch('/update_button_status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: 'ON' })
+        })
+      });
+      btn.addEventListener('mouseup', async () => {
+        btn.style.backgroundColor = 'green';
+        await fetch('/update_button_status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: 'OFF' })
+        })
+      });
+
+      reset = document.getElementById('reset');
+
+      reset.addEventListener('click', async () => {
+        await fetch('/update_tof_data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ mm_data: 10 })
+        })
+      });
+    </script>
+</body>
+
+</html>
