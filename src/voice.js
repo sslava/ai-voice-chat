@@ -36,7 +36,7 @@ module.exports = class ConversationVoice extends EventEmitter {
     if (this.isAborted()) {
       return;
     }
-    const filename = `./temp/${this.session_id}-${index}.mp3`;
+    const filename = `./out/${this.session_id}-${index}.mp3`;
 
     await fs.promises.writeFile(filename, buffer);
 

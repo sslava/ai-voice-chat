@@ -192,4 +192,5 @@ base_aoai.txt
 wolfram.txt
 
 output.wav
-temp/*
+out/*
+!out/.gitkeep
