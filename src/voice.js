@@ -17,12 +17,18 @@ module.exports = class ConversationVoice extends EventEmitter {
 
     this.on('say', this.startSaying);
 
+    this.lastIndex = -1;
+    this.lastPlayed = -1;
+
     this.audio = null;
   }
 
   say(text, index) {
     if (this.isAborted()) {
       return;
+    }
+    if (index >= this.lastIndex) {
+      this.lastIndex = index;
     }
     this.emit('say', text, index);
   }
@@ -42,6 +48,7 @@ module.exports = class ConversationVoice extends EventEmitter {
 
     if (await this.waitForIndex(index)) {
       await this.playFile(filename);
+      this.lastPlayed = index;
       if (!this.isAborted()) {
         this.playIndex++;
       }
@@ -68,15 +75,12 @@ module.exports = class ConversationVoice extends EventEmitter {
       if (this.isAborted()) {
         return false;
       }
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 20));
     }
     return true;
   }
 
   isAborted() {
-    if (this.aborted) {
-      console.log('speech: aborted');
-    }
     return this.aborted;
   }
 
@@ -92,6 +96,15 @@ module.exports = class ConversationVoice extends EventEmitter {
     if (this.audio) {
       return 'speaking';
     }
-    return null;
+    // all audio has been played
+    if (
+      this.lastPlayed !== -1 &&
+      this.lastIndex !== -1 &&
+      this.lastPlayed === this.lastIndex
+    ) {
+      return 'waiting';
+    }
+
+    return 'thinking';
   }
 };

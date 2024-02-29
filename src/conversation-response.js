@@ -92,9 +92,6 @@ module.exports = class ConversationResponse {
 
   getState() {
     const state = this.voice.getState();
-    if (state) {
-      return state;
-    }
-    return 'waiting'
+    return state;
   }
 };
