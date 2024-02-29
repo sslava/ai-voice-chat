@@ -15,7 +15,7 @@ module.exports = class MicManager {
       return;
     }
     this.started = true;
-    this.micInstance = mic({ rate: '44100', channels: '1', fileType: 'wav' });
+    this.micInstance = mic({ rate: '16000', channels: '1', fileType: 'wav' });
 
     const micInputStream = this.micInstance.getAudioStream();
     const stream = fs.createWriteStream('output.wav');
