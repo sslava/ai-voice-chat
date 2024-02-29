@@ -21,14 +21,14 @@ module.exports = class ConversationResponse {
 
   /**
    * Starts the conversation with user speech.
-   * @param {string} user_speech - The user's speech.
+   * @param {string} speech - The user's speech.
    */
-  async start(user_speech) {
+  async start(speech) {
     if (this.isAborted()) {
       return;
     }
 
-    const text = await this.ai.whisper(user_speech);
+    const text = await this.ai.whisper(speech);
     console.log('user: ', text);
 
     if (!text) {
@@ -38,10 +38,10 @@ module.exports = class ConversationResponse {
     if (this.isAborted()) {
       return;
     }
-    await this.process_completion();
+    await this.processCompletion();
   }
 
-  async process_completion() {
+  async processCompletion() {
     const completion = await this.ai.completion(this.history);
     if (this.isAborted()) {
       return;
@@ -57,7 +57,7 @@ module.exports = class ConversationResponse {
       const delta = chunk.choices[0]?.delta?.content;
       if (delta) {
         chunks.push(delta);
-        if (chunks.phrase_complete()) {
+        if (chunks.phraseComplete()) {
           const sentence = chunks.pop();
           this.voice.say(sentence, index++);
         }
@@ -88,5 +88,13 @@ module.exports = class ConversationResponse {
     console.log('conversation: aborting...');
     await this.voice.abort();
     this.aborted = true;
+  }
+
+  getState() {
+    const state = this.voice.getState();
+    if (state) {
+      return state;
+    }
+    return 'thinking'
   }
 };

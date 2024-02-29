@@ -8,11 +8,17 @@
 </head>
 <style>
   body {
+    height: 100vh;
+    margin: 0;
+  }
+
+  .state {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    height: 100px;
+    font-size: 30px;
+    margin-bottom: 90px;
   }
 
   .container {
@@ -39,10 +45,12 @@
 </style>
 
 <body>
+  <div class="state" id="state"></div>
   <div class="container">
     <button id="btn">Mic</button>
     <button id="reset">Reset</button>
-    </dib>
+  </div>
+
     <script>
       btn = document.getElementById('btn');
       btn.addEventListener('mousedown', async () => {
@@ -77,6 +85,30 @@
           body: JSON.stringify({ mm_data: 10 })
         })
       });
+
+      const state = document.getElementById('state');
+
+      async function updateState(prevState) {
+        const response = await fetch('/state');
+        const data = await response.json();
+        if (prevState !== data.state) {
+          state.innerHTML = data.state;
+        }
+        return data.state;
+      }
+
+      async function stateLoop() {
+        let prevState = ''
+        while (true) {
+          prevState = await updateState(prevState);
+          await new Promise(resolve => setTimeout(resolve, 80))
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        stateLoop();
+      });
+
     </script>
 </body>
 

@@ -11,11 +11,11 @@ module.exports = class ConversationVoice extends EventEmitter {
     super();
     this.ai = ai;
     this.aborted = false;
-    this.play_index = 0;
+    this.playIndex = 0;
 
-    this.session_id = uuid();
+    this.sessionId = uuid();
 
-    this.on('say', this.start_saying);
+    this.on('say', this.startSaying);
 
     this.audio = null;
   }
@@ -27,7 +27,7 @@ module.exports = class ConversationVoice extends EventEmitter {
     this.emit('say', text, index);
   }
 
-  async start_saying(text, index) {
+  async startSaying(text, index) {
     console.log(`god (${index}): `, text);
     if (this.isAborted()) {
       return;
@@ -36,20 +36,20 @@ module.exports = class ConversationVoice extends EventEmitter {
     if (this.isAborted()) {
       return;
     }
-    const filename = `./out/${this.session_id}-${index}.mp3`;
+    const filename = `./out/${this.sessionId}-${index}.mp3`;
 
     await fs.promises.writeFile(filename, buffer);
 
-    if (await this.wait_for_index(index)) {
-      await this.play_file(filename);
+    if (await this.waitForIndex(index)) {
+      await this.playFile(filename);
       if (!this.isAborted()) {
-        this.play_index++;
+        this.playIndex++;
       }
     }
     await fs.promises.rm(filename);
   }
 
-  async play_file(filename) {
+  async playFile(filename) {
     this.audio = player.play(filename, (err) => {
       if (err) {
         console.error('speech: error playing', err);
@@ -63,8 +63,8 @@ module.exports = class ConversationVoice extends EventEmitter {
     this.audio = null;
   }
 
-  async wait_for_index(index) {
-    while (index !== this.play_index) {
+  async waitForIndex(index) {
+    while (index !== this.playIndex) {
       if (this.isAborted()) {
         return false;
       }
@@ -87,4 +87,11 @@ module.exports = class ConversationVoice extends EventEmitter {
       this.audio.kill();
     }
   }
-}
+
+  getState() {
+    if (this.audio) {
+      return 'speaking';
+    }
+    return null;
+  }
+};

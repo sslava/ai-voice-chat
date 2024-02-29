@@ -3,23 +3,25 @@ const MicManager = require('./mic');
 const ConversationResponse = require('./conversation-response');
 
 module.exports = class Conversation {
-  constructor(system_prompt) {
-    this.system_prompt = system_prompt;
+  constructor(systemPrompt) {
+    this.systemPrompt = systemPrompt;
     this.mic = new MicManager();
     this.ai = new AIWrapper();
-    this.history = [{ role: 'system', content: this.system_prompt }];
+    this.history = [{ role: 'system', content: this.systemPrompt }];
     this.response = null;
+    this.state = 'idle';
   }
 
-  async start_listening() {
+  async startListening() {
     if (this.mic.isStarted()) {
       return;
     }
-    await this.abort_response();
+    await this.abortResponse();
     this.mic.start();
+    this.state = 'listening';
   }
 
-  async start_responding() {
+  async startResponding() {
     if (!this.mic.isStarted()) {
       return;
     }
@@ -29,7 +31,7 @@ module.exports = class Conversation {
     await this.response.start(stream);
   }
 
-  async abort_response() {
+  async abortResponse() {
     if (this.response) {
       await this.response.abort();
       this.response = null;
@@ -37,7 +39,15 @@ module.exports = class Conversation {
   }
 
   async clear() {
-    await this.abort_response();
-    this.history = [{ role: 'system', content: this.system_prompt }];
+    await this.abortResponse();
+    this.history = [{ role: 'system', content: this.systemPrompt }];
+    this.state = 'idle';
+  }
+
+  getState() {
+    if (this.response) {
+      return this.response.getState();
+    }
+    return this.state;
   }
 };

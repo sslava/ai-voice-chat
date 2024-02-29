@@ -16,29 +16,35 @@ process.on('uncaughtException',  (err) => {
   console.log(err);
 });
 
-
 class ConversationEvents extends EventEmitter {
-  constructor(system_prompt) {
+  /**
+   * @param {string} systemPrompt system prompt
+   */
+  constructor(systemPrompt) {
     super();
-    this.conversation = new Conversation(system_prompt);
+    this.conversation = new Conversation(systemPrompt);
 
-    this.on('start_listening', async () => {
-      await this.conversation.start_listening();
+    this.on('startListening', async () => {
+      await this.conversation.startListening();
     });
-    this.on('start_responding', async () => {
-      await this.conversation.start_responding();
+    this.on('startResponding', async () => {
+      await this.conversation.startResponding();
     });
     this.on('clear', async () => {
       await this.conversation.clear();
     });
   }
 
-  start_listening() {
-    this.emit('start_listening');
+  getState() {
+    return this.conversation.getState();
   }
 
-  start_responding() {
-    this.emit('start_responding');
+  startListening() {
+    this.emit('startListening');
+  }
+
+  startResponding() {
+    this.emit('startResponding');
   }
 
   clear() {
@@ -54,17 +60,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
-
 const conversation = new ConversationEvents(prompt);
 
 
 app.post('/update_button_status', async (req, res) => {
   const status = req.body?.status == 'ON';
   if (status) {
-    conversation.start_listening();
+    conversation.startListening();
   } else {
-    conversation.start_responding();
+    conversation.startResponding();
   }
   res.json({ event: status });
 });
@@ -72,6 +76,10 @@ app.post('/update_button_status', async (req, res) => {
 app.post('/update_tof_data', async (req, res) => {
   const result = await conversation.clear();
   res.json({ cleared: result });
+});
+
+app.get('/state', async (req, res) => {
+  res.json({ state: conversation.getState() });
 });
 
 app.listen(8000, '0.0.0.0', () => {

@@ -13,7 +13,7 @@ module.exports = class DialogChunks {
     this.phrase += delta;
   }
 
-  phrase_complete() {
+  phraseComplete() {
     const last = this.phrase.slice(-1);
     return (
       (last === '.' || last === '?') && this.phrase.length > this.min_length
