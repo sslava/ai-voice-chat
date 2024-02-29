@@ -53,6 +53,5 @@ module.exports = class Conversation {
 
   async greetings() {
     this.state = 'waiting';
-    this.history.push({ role: 'system', content: 'Hello!' });
   }
 };
