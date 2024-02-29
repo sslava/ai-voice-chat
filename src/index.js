@@ -73,7 +73,7 @@ app.post('/update_button_status', async (req, res) => {
   res.json({ event: status });
 });
 
-app.post('/update_tof_data', async (req, res) => {
+app.post('/reset_session', async (req, res) => {
   const result = conversation.clear();
   res.json({ cleared: result });
 });
