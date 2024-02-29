@@ -77,7 +77,7 @@
       reset = document.getElementById('reset');
 
       reset.addEventListener('click', async () => {
-        await fetch('/update_tof_data', {
+        await fetch('/reset_session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
