@@ -33,10 +33,17 @@ class ConversationEvents extends EventEmitter {
     this.on('clear', async () => {
       await this.conversation.clear();
     });
+    this.on('hello', async () => {
+      await this.conversation.greetings();
+    });
   }
 
   getState() {
     return this.conversation.getState();
+  }
+
+  hello() {
+    this.emit('hello');
   }
 
   startListening() {
@@ -56,8 +63,15 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use(express.static('public'));
+
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.get('/testing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'testing.html'));
 });
 
 const conversation = new ConversationEvents(prompt);
@@ -74,13 +88,19 @@ app.post('/update_button_status', async (req, res) => {
 });
 
 app.post('/reset_session', async (req, res) => {
-  const result = conversation.clear();
-  res.json({ cleared: result });
+  conversation.clear();
+  res.json({ ok: true });
 });
 
 app.get('/state', async (req, res) => {
   res.json({ state: conversation.getState() });
 });
+
+app.post('/hello', async (req, res) => {
+  const result = conversation.hello();
+  res.json({ ok: true });
+});
+
 
 app.listen(8000, '0.0.0.0', () => {
   console.log('Server started on http://localhost:8000');

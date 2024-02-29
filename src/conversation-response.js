@@ -95,6 +95,6 @@ module.exports = class ConversationResponse {
     if (state) {
       return state;
     }
-    return 'thinking'
+    return 'waiting'
   }
 };
