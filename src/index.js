@@ -64,7 +64,7 @@ const conversation = new ConversationEvents(prompt);
 
 
 app.post('/update_button_status', async (req, res) => {
-  const status = req.body?.status == 'ON';
+  const status = req.body?.status === 'ON';
   if (status) {
     conversation.startListening();
   } else {
