@@ -1,9 +1,11 @@
-const EventEmitter = require('events');
-const uuid = require('uuid').v4;
-const fs = require('fs');
-const player = require('play-sound')();
+import EventEmitter  from 'node:events';
+import fs from  'node:fs';
+import { v4 as uuid } from 'uuid';
+import playSound from 'play-sound';
 
-module.exports = class ConversationVoice extends EventEmitter {
+const player = playSound();
+
+export default class ConversationVoice extends EventEmitter {
   /**
    * @param {AIWrapper} ai - The AI wrapper object.
    */

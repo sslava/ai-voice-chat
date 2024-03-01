@@ -1,16 +1,22 @@
-const express = require('express');
-const path = require('path');
-const EventEmitter = require('events');
-const fs = require('fs');
-const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const Conversation = require('./conversation');
+import EventEmitter  from 'node:events';
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+
+import Conversation from './conversation.mjs';
 
 dotenv.config();
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const views = path.join(__dirname, 'views');
 
-const prompt = fs.readFileSync(path.join(__dirname, 'prompt.txt'), 'utf-8');
+
+const prompt = fs.readFileSync('prompt.txt', 'utf-8');
 
 process.on('uncaughtException',  (err) => {
   console.log(err);
@@ -46,12 +52,8 @@ class ConversationEvents extends EventEmitter {
     this.emit('hello');
   }
 
-  startListening() {
-    this.emit('startListening');
-  }
-
-  startResponding() {
-    this.emit('startResponding');
+  togge(start) {
+    this.emit(start ? 'startListening': 'stopListening');
   }
 
   clear() {
@@ -66,24 +68,20 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+app.get('/', (_, res) => {
+  res.sendFile(path.join(views, 'index.html'));
 });
 
-app.get('/testing', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'testing.html'));
+app.get('/testing', (_, res) => {
+  res.sendFile(path.join(views, 'testing.html'));
 });
 
 const conversation = new ConversationEvents(prompt);
 
 
 app.post('/update_button_status', async (req, res) => {
-  const status = req.body?.status === 'ON';
-  if (status) {
-    conversation.startListening();
-  } else {
-    conversation.startResponding();
-  }
+  const status = req.body?.status === 'ON'
+  conversation.togge(status);
   res.json({ event: status });
 });
 

@@ -1,4 +1,4 @@
-module.exports = class DialogChunks {
+export default class DialogChunks {
   constructor() {
     this.text = '';
     this.phrase = '';

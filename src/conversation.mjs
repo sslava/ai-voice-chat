@@ -1,8 +1,8 @@
-const AIWrapper = require('./aiwrapper');
-const MicManager = require('./mic');
-const ConversationResponse = require('./conversation-response');
+import AIWrapper from './aiwrapper.mjs';
+import MicManager from './mic.mjs';
+import ConversationResponse from './conversation-response.mjs';
 
-module.exports = class Conversation {
+export default class Conversation {
   constructor(systemPrompt) {
     this.systemPrompt = systemPrompt;
     this.mic = new MicManager();

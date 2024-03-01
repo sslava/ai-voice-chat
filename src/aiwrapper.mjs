@@ -1,6 +1,6 @@
-const { OpenAI } = require('openai');
+import { OpenAI } from 'openai';
 
-module.exports = class AIWrapper {
+export default class AIWrapper {
   constructor() {
     this.openai = new OpenAI();
   }

@@ -1,7 +1,7 @@
-const mic = require('mic');
-const fs = require('fs');
+import fs from 'node:fs';
+import mic  from 'mic';
 
-module.exports = class MicManager {
+export default class MicManager {
   constructor() {
     this.started = false;
   }

@@ -1,12 +1,12 @@
-const DialogChunks = require('./dialog-chunks');
-const ConversationVoice = require('./voice');
+import DialogChunks from './dialog-chunks.mjs';
+import ConversationVoice from './voice.mjs';
 
 
 /**
  * Represents a conversation response.
  * @class
  */
-module.exports = class ConversationResponse {
+export default class ConversationResponse {
   /**
    * @param {AIWrapper} ai - The AI wrapper object.
    * @param {Array} history - The conversation history.
