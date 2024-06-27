@@ -11,7 +11,7 @@ npm dev
 # start 
 
 ```bash
-node src/index.js
+node src/index.mjs
 ```
 
 # .env

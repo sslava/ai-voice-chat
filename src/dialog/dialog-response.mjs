@@ -26,7 +26,7 @@ export default class DialogResponse {
 
   async transcribe(file) {
     const audioStream = fs.createReadStream(file);
-    const transcript = await this.ai.whisper(audioStream);
+    const transcript = await this.ai.transcribe(audioStream);
     audioStream.close();
     await fs.promises.rm(file);
     return transcript;

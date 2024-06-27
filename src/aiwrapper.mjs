@@ -5,7 +5,7 @@ export default class OpenAIAPI {
     this.openai = new OpenAI();
   }
 
-  async whisper(stream) {
+  async transcribe(stream) {
     const result = await this.openai.audio.transcriptions.create({
       file: stream,
       model: 'whisper-1',
@@ -24,10 +24,10 @@ export default class OpenAIAPI {
     });
   }
 
-  async tts(text) {
+  async tts(text, voice = 'nova') {
     const result = await this.openai.audio.speech.create({
       model: 'tts-1',
-      voice: 'nova',
+      voice,
       response_format: 'mp3',
       input: text,
     });
