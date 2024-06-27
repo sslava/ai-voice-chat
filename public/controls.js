@@ -16,7 +16,7 @@ btn.addEventListener('mousedown', async () => {
 });
 
 btn.addEventListener('mouseup', async () => {
-  btn.style.backgroundColor = 'green';
+  btn.style.backgroundColor = '#AAf44336';
   await apiCall('toggle-button', { status: 'OFF' });
 });
 

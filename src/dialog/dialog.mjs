@@ -27,11 +27,12 @@ export class Dialog {
   }
 
   async respond() {
-    if (this.mic.isListening) {
-      const wavFile = this.mic.stop();
-      this.response = new DialogResponse(this.ai, this.history);
-      await this.response.process(wavFile);
+    if (!this.mic.isListening) {
+      return;
     }
+    const wavFile = this.mic.stop();
+    this.response = new DialogResponse(this.ai, this.history);
+    await this.response.process(wavFile);
   }
 
   async bye() {
