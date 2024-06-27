@@ -1,7 +1,6 @@
 import DialogChunks from './dialog-chunks.mjs';
 import ConversationVoice from './voice.mjs';
 
-
 /**
  * Represents a conversation response.
  * @class
@@ -94,4 +93,4 @@ export default class ConversationResponse {
     const state = this.voice.getState();
     return state;
   }
-};
+}

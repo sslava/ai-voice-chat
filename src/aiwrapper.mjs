@@ -35,4 +35,4 @@ export default class AIWrapper {
     const arrayBuffer = await result.arrayBuffer();
     return Buffer.from(arrayBuffer);
   }
-};
+}

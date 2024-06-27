@@ -46,7 +46,7 @@ export default class Conversation {
 
   getState() {
     if (this.response) {
-      return this.response.getState();
+      return this.response?.getState();
     }
     return this.state;
   }
@@ -54,4 +54,4 @@ export default class Conversation {
   async greetings() {
     this.state = 'waiting';
   }
-};
+}

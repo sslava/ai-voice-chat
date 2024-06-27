@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import mic  from 'mic';
+import mic from 'mic';
 
 export default class MicManager {
   constructor() {
@@ -32,4 +32,4 @@ export default class MicManager {
 
     return fs.createReadStream('output.wav');
   }
-};
+}

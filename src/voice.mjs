@@ -1,5 +1,5 @@
-import EventEmitter  from 'node:events';
-import fs from  'node:fs';
+import EventEmitter from 'node:events';
+import fs from 'node:fs';
 import { v4 as uuid } from 'uuid';
 import playSound from 'play-sound';
 
@@ -109,4 +109,4 @@ export default class ConversationVoice extends EventEmitter {
 
     return 'thinking';
   }
-};
+}
