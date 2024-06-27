@@ -1,4 +1,4 @@
-import OpenAIAPI from '../aiwrapper.mjs';
+import OpenAIAPI from '../openai-api.mjs';
 import MicManager from '../mic.mjs';
 import DialogResponse from './dialog-response.mjs';
 
