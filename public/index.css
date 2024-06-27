@@ -1,0 +1,64 @@
+body {
+  height: 100vh;
+  margin: 0;
+  background-color: black;
+  position: relative;
+}
+
+#video-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+#video-container video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+}
+
+.inactive-video {
+  opacity: 0;
+}
+
+.active-video {
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+.controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#mic-btn {
+  padding: 30px 80px;
+  font-size: 25px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: green;
+  border: none;
+}
+.controls-row {
+  display: flex;
+  gap: 1rem;
+}
+
+#reset, #hello {
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+  background-color: aliceblue;
+  opacity: 0.7;
+  border: none;
+}

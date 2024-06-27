@@ -27,10 +27,6 @@ app.get('/', (_, res) => {
   res.render('index');
 });
 
-app.get('/controls', (_, res) => {
-  res.render('controls');
-});
-
 app.get('/api/state', async (_, res) => {
   res.json({ state: conversation.state });
 });
