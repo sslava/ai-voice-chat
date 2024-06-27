@@ -11,28 +11,22 @@ export default class Voice extends EventEmitter {
   interrupted = false;
   sessionId = nanoid();
 
+  playIndex = 0;
+  lastPlayed = -1;
+  index = -1;
+
+  audio = null;
+
   constructor(ai) {
     super();
     this.ai = ai;
-    this.playIndex = 0;
-
-    this.lastIndex = -1;
-    this.lastPlayed = -1;
-
-    this.audio = null;
-
     this.on('process', this.process);
   }
 
-  say(text, index) {
-    if (this.interrupted) {
-      return;
-    }
-    if (index >= this.lastIndex) {
-      this.lastIndex = index;
-    }
-    console.log(`ai (${index}): `, text);
-    this.emit('process', text, index);
+  say(text) {
+    this.index++;
+    console.log(`ai (${this.index}): `, text);
+    this.emit('process', text, this.index);
   }
 
   async process(text, index) {
@@ -43,7 +37,6 @@ export default class Voice extends EventEmitter {
     const filename = `./out/${this.sessionId}-${index}.mp3`;
 
     await fs.writeFile(filename, buffer);
-
     if (await this.waitForIndex(index)) {
       await this.playFile(filename);
       this.lastPlayed = index;
@@ -65,7 +58,6 @@ export default class Voice extends EventEmitter {
       this.audio.on('close', resolve);
       this.audio.on('exit', resolve);
     });
-
     this.audio = null;
   }
 
@@ -81,9 +73,7 @@ export default class Voice extends EventEmitter {
 
   async interrupt() {
     this.interrupted = true;
-    if (this.audio) {
-      this.audio.kill();
-    }
+    this.audio?.kill();
   }
 
   get state() {
@@ -93,12 +83,11 @@ export default class Voice extends EventEmitter {
     // all audio has been played
     if (
       this.lastPlayed !== -1 &&
-      this.lastIndex !== -1 &&
-      this.lastPlayed === this.lastIndex
+      this.index !== -1 &&
+      this.lastPlayed === this.index
     ) {
       return 'waiting';
     }
-
     return 'thinking';
   }
 }

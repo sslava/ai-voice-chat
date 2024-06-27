@@ -28,9 +28,9 @@ export class Dialog {
 
   async respond() {
     if (this.mic.isListening) {
-      const stream = this.mic.stop();
+      const wavFile = this.mic.stop();
       this.response = new DialogResponse(this.ai, this.history);
-      await this.response.process(stream);
+      await this.response.process(wavFile);
     }
   }
 

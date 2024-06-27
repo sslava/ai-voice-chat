@@ -1,3 +1,4 @@
+import fs from 'fs';
 import DialogChunks from './dialog-chunks.mjs';
 import Voice from '../voice.mjs';
 
@@ -10,16 +11,29 @@ export default class DialogResponse {
     this.history = history;
   }
 
-  async process(audioStream) {
-    const transcript = await this.ai.whisper(audioStream);
+  async process(file) {
+    const transcript = await this.transcribe(file);
     if (!transcript || this.interrupted) {
       return;
     }
     console.log('user: ', transcript);
     this.history.push({ role: 'user', content: transcript });
+    const response = await this.respond();
+    if (response) {
+      this.history.push({ role: 'assistant', content: response });
+    }
+  }
 
+  async transcribe(file) {
+    const audioStream = fs.createReadStream(file);
+    const transcript = await this.ai.whisper(audioStream);
+    audioStream.close();
+    await fs.promises.rm(file);
+    return transcript;
+  }
+
+  async respond() {
     const chunks = new DialogChunks();
-    let index = 0;
 
     const completion = await this.ai.completion(this.history);
     for await (const chunk of completion) {
@@ -31,16 +45,15 @@ export default class DialogResponse {
         chunks.push(delta);
         if (chunks.hasCompleteSentence()) {
           const sentence = chunks.popSentence();
-          this.voice.say(sentence, index++);
+          this.voice.say(sentence);
         }
       }
     }
-
     const sentence = chunks.popSentence();
     if (sentence) {
-      this.voice.say(sentence, index++);
+      this.voice.say(sentence);
     }
-    this.history.push({ role: 'assistant', content: chunks.text });
+    return chunks.text;
   }
 
   async interrupt() {
