@@ -13,8 +13,10 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
     "mic": "^2.1.2",
+    "nanoid": "^5.0.7",
     "nodemon": "^3.1.4",
     "openai": "^4.52.1",
     "play-sound": "^1.1.6",

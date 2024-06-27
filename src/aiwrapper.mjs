@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai';
 
-export default class AIWrapper {
+export default class OpenAIAPI {
   constructor() {
     this.openai = new OpenAI();
   }
@@ -16,13 +16,12 @@ export default class AIWrapper {
   }
 
   async completion(messages) {
-    const stream = await this.openai.chat.completions.create({
+    return await this.openai.chat.completions.create({
       model: 'gpt-4',
       temperature: 0.5,
       messages: messages,
       stream: true,
     });
-    return stream;
   }
 
   async tts(text) {

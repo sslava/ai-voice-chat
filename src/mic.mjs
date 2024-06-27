@@ -2,34 +2,31 @@ import fs from 'node:fs';
 import mic from 'mic';
 
 export default class MicManager {
-  constructor() {
-    this.started = false;
-  }
+  listening_ = false;
 
-  isStarted() {
-    return this.started;
+  get isListening() {
+    return this.listening_;
   }
 
   start() {
-    if (this.started) {
+    if (this.listening_) {
       return;
     }
-    this.started = true;
-    this.micInstance = mic({ rate: '16000', channels: '1', fileType: 'wav' });
+    this.listening_ = true;
+    this.mic = mic({ rate: '16000', channels: '1', fileType: 'wav' });
 
-    const micInputStream = this.micInstance.getAudioStream();
+    const micInputStream = this.mic.getAudioStream();
     const stream = fs.createWriteStream('output.wav');
     micInputStream.pipe(stream);
-    this.micInstance.start();
+    this.mic.start();
   }
 
   stop() {
-    if (!this.started) {
-      return;
+    if (!this.listening_) {
+      return null;
     }
-    this.micInstance.stop();
-    this.started = false;
-
+    this.listening_ = false;
+    this.mic.stop();
     return fs.createReadStream('output.wav');
   }
 }

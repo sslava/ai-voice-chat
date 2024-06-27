@@ -7,7 +7,7 @@ const states = {
 };
 
 async function getState() {
-  const response = await fetch('/state');
+  const response = await fetch('/api/state');
   const data = await response.json();
   return data.state;
 }
@@ -45,7 +45,7 @@ async function stateLoop() {
     } catch (e) {
       console.error(e);
     }
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
 }
 

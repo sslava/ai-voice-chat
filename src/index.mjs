@@ -1,100 +1,61 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
-import EventEmitter from 'node:events';
-
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 
-import Conversation from './conversation.mjs';
+import { DialogManager } from './dialog/dialog-manager.mjs';
 
 dotenv.config();
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const views = path.join(__dirname, 'views');
+const { HOST, PORT } = process.env;
 
 const prompt = fs.readFileSync('prompt.txt', 'utf-8');
 
-process.on('uncaughtException', (err) => {
-  console.log(err);
-});
-
-class ConversationEvents extends EventEmitter {
-  /**
-   * @param {string} systemPrompt system prompt
-   */
-  constructor(systemPrompt) {
-    super();
-    this.conversation = new Conversation(systemPrompt);
-
-    this.on('startListening', () => {
-      this.conversation.startListening();
-    });
-    this.on('startResponding', async () => {
-      this.conversation.startResponding();
-    });
-    this.on('clear', () => {
-      this.conversation.clear();
-    });
-    this.on('hello', () => {
-      this.conversation.greetings();
-    });
-  }
-
-  getState() {
-    return this.conversation.getState();
-  }
-
-  hello() {
-    this.emit('hello');
-  }
-
-  togge(start) {
-    this.emit(start ? 'startListening' : 'stopListening');
-  }
-
-  clear() {
-    this.emit('clear');
-  }
-}
+const conversation = new DialogManager(prompt);
 
 const app = express();
-const conversation = new ConversationEvents(prompt);
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(process.cwd(), 'src', 'views'));
 
 app.use(bodyParser.json());
 
 app.use(express.static('public'));
 
 app.get('/', (_, res) => {
-  res.sendFile(path.join(views, 'index.html'));
+  res.render('index');
 });
 
 app.get('/controls', (_, res) => {
-  res.sendFile(path.join(views, 'controls.html'));
+  res.render('controls');
 });
 
-app.post('/update_button_status', async (req, res) => {
-  const status = req.body?.status === 'ON';
-  conversation.togge(status);
-  res.json({ event: status });
-});
-
-app.post('/reset_session', async (req, res) => {
-  conversation.clear();
-  res.json({ ok: true });
-});
-
-app.get('/state', async (_, res) => {
+app.get('/api/state', async (_, res) => {
   res.json({ state: conversation.getState() });
 });
 
-app.post('/hello', async (_, res) => {
-  conversation.hello();
+app.post('/api/toggle-button', async (req, res) => {
+  const status = req.body?.status === 'ON';
+  status ? conversation.listen() : conversation.respond();
   res.json({ ok: true });
 });
 
-app.listen(8000, '0.0.0.0', () => {
-  console.log('Server started on http://localhost:8000');
+app.post('/api/reset-session', async (_, res) => {
+  conversation.bye();
+  res.json({ ok: true });
+});
+
+app.post('/api/greetings', async (_, res) => {
+  conversation.greetings();
+  res.json({ ok: true });
+});
+
+const server = app.listen(PORT ? +PORT : 8000, HOST ?? '0.0.0.0', () => {
+  const info = server?.address();
+  console.info(`[app]: started http://${info?.address}:${info?.port}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.log(err);
 });
