@@ -1,21 +1,25 @@
-# install 
-```bash
-npm install
-```
+# AI voice Chat
 
-# dev 
+## Description
 
-```bash
-npm dev
-```
-# start 
+## Installation
 
-```bash
-node src/index.mjs
-```
+To install this project, follow these steps:
 
-# .env
+1. Clone the repository.
+2. Run `npm install` to install dependencies.
 
-```
-OPENAI_API_KEY=your_api_key
-```
+## Usage
+
+To use this project, follow these steps:
+
+1. Run `npm start` to start the application.
+2. Open your browser and navigate to `http://localhost:8000`.
+
+## Contributing
+
+Contributions are welcome! Please follow the guidelines outlined in the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
