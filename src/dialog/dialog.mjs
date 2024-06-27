@@ -1,12 +1,12 @@
 import OpenAIAPI from '../aiwrapper.mjs';
 import MicManager from '../mic.mjs';
-import ConversationResponse from '../conversation-response.mjs';
+import DialogResponse from './dialog-response.mjs';
 
 export class Dialog {
   mic = new MicManager();
   ai = new OpenAIAPI();
 
-  state = 'idle';
+  state_ = 'idle';
   response = null;
 
   constructor(prompt) {
@@ -15,51 +15,46 @@ export class Dialog {
   }
 
   greetings() {
-    this.state = 'waiting';
+    this.state_ = 'waiting';
   }
 
   async listen() {
-    if (!this.mic.isListening) {
-      await this.interrupt();
-      this.mic.start();
-      this.state = 'listening';
+    if (this.mic.isListening) {
+      return;
     }
+    await this.interrupt();
+    this.mic.start();
   }
 
   async respond() {
-    if (!this.mic.isListening) {
-      return;
+    if (this.mic.isListening) {
+      const stream = this.mic.stop();
+      this.response = new DialogResponse(this.ai, this.history);
+      await this.response.process(stream);
     }
-    const stream = this.mic.stop();
-    this.response = new ConversationResponse(this.ai, this.history);
-    await this.response.start(stream);
   }
 
   async bye() {
     await this.interrupt();
     this.history = this.emptyHistory();
-    this.state = 'idle';
-  }
-
-  getState() {
-    if (this.response) {
-      return this.response?.getState();
-    }
-    return this.state;
+    this.state_ = 'idle';
   }
 
   async interrupt() {
     if (this.response) {
-      await this.response.abort();
+      await this.response.interrupt();
       this.response = null;
     }
   }
 
-  emptyHistory() {
-    return [{ role: 'system', content: this.prompt }];
+  get state() {
+    if (this.mic.isListening) {
+      return 'listening';
+    }
+    return this.response?.state ?? this.state_;
   }
 
-  changeState(newState) {
-    this.state = newState;
+  emptyHistory() {
+    return [{ role: 'system', content: this.prompt }];
   }
 }

@@ -32,7 +32,7 @@ app.get('/controls', (_, res) => {
 });
 
 app.get('/api/state', async (_, res) => {
-  res.json({ state: conversation.getState() });
+  res.json({ state: conversation.state });
 });
 
 app.post('/api/toggle-button', async (req, res) => {

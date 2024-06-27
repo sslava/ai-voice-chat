@@ -24,10 +24,6 @@ export class DialogManager extends EventEmitter {
     });
   }
 
-  getState() {
-    return this.dialog.getState();
-  }
-
   greetings() {
     this.emit('greetings');
   }
@@ -42,5 +38,9 @@ export class DialogManager extends EventEmitter {
 
   bye() {
     this.emit('bye');
+  }
+
+  get state() {
+    return this.dialog.state;
   }
 }

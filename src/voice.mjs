@@ -1,61 +1,57 @@
 import EventEmitter from 'node:events';
-import fs from 'node:fs';
-import { v4 as uuid } from 'uuid';
+import fs from 'node:fs/promises';
+import { nanoid } from 'nanoid';
 import playSound from 'play-sound';
+
+import { sleep } from './utils.mjs';
 
 const player = playSound();
 
-export default class ConversationVoice extends EventEmitter {
-  /**
-   * @param {AIWrapper} ai - The AI wrapper object.
-   */
+export default class Voice extends EventEmitter {
+  interrupted = false;
+  sessionId = nanoid();
+
   constructor(ai) {
     super();
     this.ai = ai;
-    this.aborted = false;
     this.playIndex = 0;
-
-    this.sessionId = uuid();
-
-    this.on('say', this.startSaying);
 
     this.lastIndex = -1;
     this.lastPlayed = -1;
 
     this.audio = null;
+
+    this.on('process', this.process);
   }
 
   say(text, index) {
-    if (this.isAborted()) {
+    if (this.interrupted) {
       return;
     }
     if (index >= this.lastIndex) {
       this.lastIndex = index;
     }
-    this.emit('say', text, index);
+    console.log(`ai (${index}): `, text);
+    this.emit('process', text, index);
   }
 
-  async startSaying(text, index) {
-    console.log(`god (${index}): `, text);
-    if (this.isAborted()) {
-      return;
-    }
+  async process(text, index) {
     const buffer = await this.ai.tts(text);
-    if (this.isAborted()) {
+    if (this.interrupted) {
       return;
     }
     const filename = `./out/${this.sessionId}-${index}.mp3`;
 
-    await fs.promises.writeFile(filename, buffer);
+    await fs.writeFile(filename, buffer);
 
     if (await this.waitForIndex(index)) {
       await this.playFile(filename);
       this.lastPlayed = index;
-      if (!this.isAborted()) {
+      if (!this.interrupted) {
         this.playIndex++;
       }
     }
-    await fs.promises.rm(filename);
+    await fs.rm(filename);
   }
 
   async playFile(filename) {
@@ -64,6 +60,7 @@ export default class ConversationVoice extends EventEmitter {
         console.error('speech: error playing', err);
       }
     });
+
     await new Promise((resolve) => {
       this.audio.on('close', resolve);
       this.audio.on('exit', resolve);
@@ -74,27 +71,22 @@ export default class ConversationVoice extends EventEmitter {
 
   async waitForIndex(index) {
     while (index !== this.playIndex) {
-      if (this.isAborted()) {
+      if (this.interrupted) {
         return false;
       }
-      await new Promise((resolve) => setTimeout(resolve, 20));
+      await sleep(20);
     }
     return true;
   }
 
-  isAborted() {
-    return this.aborted;
-  }
-
-  async abort() {
-    console.log('speech: aborting...');
-    this.aborted = true;
+  async interrupt() {
+    this.interrupted = true;
     if (this.audio) {
       this.audio.kill();
     }
   }
 
-  getState() {
+  get state() {
     if (this.audio) {
       return 'speaking';
     }
