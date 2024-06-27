@@ -13,7 +13,7 @@ export default class MicManager {
     if (this.isListening) {
       return;
     }
-    this.currentFile_ = `mic-${nanoid()}.wav`;
+    this.currentFile_ = `./out/mic-${nanoid()}.wav`;
     this.mic = mic({ rate: '16000', channels: '1', fileType: 'wav' });
 
     const micInputStream = this.mic.getAudioStream();
