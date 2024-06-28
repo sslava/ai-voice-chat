@@ -1,4 +1,4 @@
-export default class DialogChunks {
+export default class SentenceBuffer {
   text = '';
   sentence = '';
   min_length = 40;

@@ -23,7 +23,7 @@ export default class Voice extends EventEmitter {
     this.on('process', this.process);
   }
 
-  say(text) {
+  ttsAndPlay(text) {
     this.index++;
     console.log(`ai (${this.index}): `, text);
     this.emit('process', text, this.index);

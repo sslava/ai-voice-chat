@@ -1,26 +1,25 @@
 import fs from 'fs';
-import DialogChunks from './dialog-chunks.mjs';
+import SentenceBuffer from './sentence-buffer.mjs';
 import Voice from '../voice.mjs';
 
 export default class DialogResponse {
   interrupted = false;
 
-  constructor(ai, history) {
+  constructor(ai) {
     this.ai = ai;
     this.voice = new Voice(ai);
-    this.history = history;
   }
 
-  async process(file) {
-    const transcript = await this.transcribe(file);
+  async process(audio, history) {
+    const transcript = await this.transcribe(audio);
     if (!transcript || this.interrupted) {
       return;
     }
-    console.log('user: ', transcript);
-    this.history.push({ role: 'user', content: transcript });
-    const response = await this.respond();
+    console.log('user:', transcript);
+    history.push({ role: 'user', content: transcript });
+    const response = await this.generateResponse(history);
     if (response) {
-      this.history.push({ role: 'assistant', content: response });
+      history.push({ role: 'assistant', content: response });
     }
   }
 
@@ -32,28 +31,28 @@ export default class DialogResponse {
     return transcript;
   }
 
-  async respond() {
-    const chunks = new DialogChunks();
+  async generateResponse(history) {
+    const completion = await this.ai.completion(history);
 
-    const completion = await this.ai.completion(this.history);
+    const llmResponse = new SentenceBuffer();
     for await (const chunk of completion) {
       if (this.interrupted) {
         return;
       }
       const delta = chunk.choices[0]?.delta?.content;
       if (delta) {
-        chunks.push(delta);
-        if (chunks.hasCompleteSentence()) {
-          const sentence = chunks.popSentence();
-          this.voice.say(sentence);
+        llmResponse.push(delta);
+        if (llmResponse.hasCompleteSentence()) {
+          const sentence = llmResponse.popSentence();
+          this.voice.ttsAndPlay(sentence);
         }
       }
     }
-    const sentence = chunks.popSentence();
+    const sentence = llmResponse.popSentence();
     if (sentence) {
-      this.voice.say(sentence);
+      this.voice.ttsAndPlay(sentence);
     }
-    return chunks.text;
+    return llmResponse.text;
   }
 
   async interrupt() {

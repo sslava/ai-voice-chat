@@ -31,8 +31,8 @@ export class Dialog {
       return;
     }
     const wavFile = this.mic.stop();
-    this.response = new DialogResponse(this.ai, this.history);
-    await this.response.process(wavFile);
+    this.response = new DialogResponse(this.ai);
+    await this.response.process(wavFile, this.history);
   }
 
   async bye() {
