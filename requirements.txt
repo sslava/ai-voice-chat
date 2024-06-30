@@ -1,0 +1,9 @@
+openai
+SpeechRecognition
+pyaudio
+python-dotenv
+soundfile
+sounddevice
+asyncio
+setuptools
+numpy
