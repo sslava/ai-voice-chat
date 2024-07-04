@@ -1,7 +1,5 @@
 # AI voice Chat
 
-## Description
-
 ## Installation
 
 To install this project, follow these steps:
